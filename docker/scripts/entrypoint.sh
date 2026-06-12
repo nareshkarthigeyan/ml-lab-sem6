@@ -13,7 +13,7 @@ export JAVA_HOME
 export HADOOP_HOME=${HADOOP_HOME:-/opt/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-$HADOOP_HOME/etc/hadoop}
 export HADOOP_LOG_DIR=${HADOOP_LOG_DIR:-$HADOOP_HOME/logs}
-export HADOOP_LOG_WAIT_SECONDS=${HADOOP_LOG_WAIT_SECONDS:-30}
+export HADOOP_LOG_APPEARANCE_TIMEOUT_SECONDS=${HADOOP_LOG_APPEARANCE_TIMEOUT_SECONDS:-30}
 export HDFS_NAMENODE_USER=hadoop
 export HDFS_DATANODE_USER=hadoop
 export HDFS_SECONDARYNAMENODE_USER=hadoop
@@ -43,11 +43,12 @@ for _ in $(seq 1 10); do
 done
 
 if [ "$daemons_ready" != true ]; then
+  echo "ERROR: Hadoop daemons failed to start after 10 seconds" >&2
   exit 1
 fi
 
 logs_appeared=false
-for _ in $(seq 1 "$HADOOP_LOG_WAIT_SECONDS"); do
+for _ in $(seq 1 "$HADOOP_LOG_APPEARANCE_TIMEOUT_SECONDS"); do
   if compgen -G "$HADOOP_LOG_DIR/*.log" > /dev/null; then
     logs_appeared=true
     break
