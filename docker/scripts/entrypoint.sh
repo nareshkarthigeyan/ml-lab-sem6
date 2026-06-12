@@ -33,20 +33,29 @@ su hadoop -c "$HADOOP_HOME/bin/yarn --daemon start resourcemanager"
 su hadoop -c "$HADOOP_HOME/bin/yarn --daemon start nodemanager"
 su hadoop -c "$HADOOP_HOME/bin/mapred --daemon start historyserver"
 
-if ! pgrep -f "NameNode|DataNode|ResourceManager|NodeManager|JobHistoryServer" > /dev/null; then
-  exit 1
-fi
-
-has_logs=false
-for _ in $(seq 1 "$HADOOP_LOG_WAIT_SECONDS"); do
-  if compgen -G "$HADOOP_LOG_DIR/*.log" > /dev/null; then
-    has_logs=true
+daemons_ready=false
+for _ in $(seq 1 10); do
+  if pgrep -f "NameNode|DataNode|ResourceManager|NodeManager|JobHistoryServer" > /dev/null; then
+    daemons_ready=true
     break
   fi
   sleep 1
 done
 
-if [ "$has_logs" = true ]; then
+if [ "$daemons_ready" != true ]; then
+  exit 1
+fi
+
+logs_appeared=false
+for _ in $(seq 1 "$HADOOP_LOG_WAIT_SECONDS"); do
+  if compgen -G "$HADOOP_LOG_DIR/*.log" > /dev/null; then
+    logs_appeared=true
+    break
+  fi
+  sleep 1
+done
+
+if [ "$logs_appeared" = true ]; then
   shopt -s nullglob
   log_files=("$HADOOP_LOG_DIR"/*.log)
   shopt -u nullglob

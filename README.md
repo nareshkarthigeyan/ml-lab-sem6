@@ -23,8 +23,8 @@ docker compose up -d
 Check running daemons:
 
 ```bash
-docker exec -it hadoop-single-node bash -lc "su hadoop -c 'hdfs dfsadmin -report | head -n 20'"
-docker exec -it hadoop-single-node bash -lc "su hadoop -c 'yarn node -list'"
+docker exec -u hadoop -it hadoop-single-node bash -lc "hdfs dfsadmin -report | head -n 20"
+docker exec -u hadoop -it hadoop-single-node yarn node -list
 ```
 
 ## Basic HDFS Smoke Test
