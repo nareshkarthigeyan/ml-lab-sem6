@@ -6,7 +6,8 @@ if [ -z "${JAVA_HOME:-}" ]; then
   if [ -n "$JAVA_BIN" ]; then
     JAVA_HOME=$(dirname "$(dirname "$(readlink -f "$JAVA_BIN")")")
   else
-    JAVA_HOME=/usr/lib/jvm/jre
+    echo "ERROR: Java binary not found in PATH" >&2
+    exit 1
   fi
 fi
 export JAVA_HOME
