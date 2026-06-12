@@ -20,7 +20,7 @@ services:
       - ./docker/scripts/entrypoint.sh:/entrypoint.sh:ro
       - hdfs_namenode:/opt/hadoop/data/namenode
       - hdfs_datanode:/opt/hadoop/data/datanode
-    restart: unless-stopped
+    restart: on-failure
 
 volumes:
   hdfs_namenode:
