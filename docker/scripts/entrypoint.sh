@@ -56,15 +56,15 @@ for _ in $(seq 1 "$HADOOP_LOG_APPEARANCE_TIMEOUT_SECONDS"); do
   sleep 1
 done
 
+log_files=()
 if [ "$logs_appeared" = true ]; then
   shopt -s nullglob
   log_files=("$HADOOP_LOG_DIR"/*.log)
   shopt -u nullglob
-  if [ "${#log_files[@]}" -gt 0 ]; then
-    tail -F "${log_files[@]}"
-  else
-    tail -f /dev/null
-  fi
+fi
+
+if [ "${#log_files[@]}" -gt 0 ]; then
+  tail -F "${log_files[@]}"
 else
   tail -f /dev/null
 fi
