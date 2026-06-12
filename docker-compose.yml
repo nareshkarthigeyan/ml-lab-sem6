@@ -1,0 +1,27 @@
+services:
+  hadoop:
+    image: apache/hadoop:3.3.6
+    container_name: hadoop-single-node
+    hostname: hadoop
+    user: "0:0"
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    ports:
+      - "9870:9870"
+      - "9864:9864"
+      - "8088:8088"
+      - "8042:8042"
+      - "9000:9000"
+    volumes:
+      - ./docker/hadoop-config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
+      - ./docker/hadoop-config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml:ro
+      - ./docker/hadoop-config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml:ro
+      - ./docker/hadoop-config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml:ro
+      - ./docker/hadoop-config/workers:/opt/hadoop/etc/hadoop/workers:ro
+      - ./docker/scripts/entrypoint.sh:/entrypoint.sh:ro
+      - hdfs_namenode:/opt/hadoop/data/namenode
+      - hdfs_datanode:/opt/hadoop/data/datanode
+    restart: on-failure
+
+volumes:
+  hdfs_namenode:
+  hdfs_datanode:
