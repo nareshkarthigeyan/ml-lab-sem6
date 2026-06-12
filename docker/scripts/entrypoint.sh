@@ -13,6 +13,7 @@ export JAVA_HOME
 export HADOOP_HOME=${HADOOP_HOME:-/opt/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-$HADOOP_HOME/etc/hadoop}
 export HADOOP_LOG_DIR=${HADOOP_LOG_DIR:-$HADOOP_HOME/logs}
+export HADOOP_LOG_WAIT_SECONDS=${HADOOP_LOG_WAIT_SECONDS:-30}
 export HDFS_NAMENODE_USER=hadoop
 export HDFS_DATANODE_USER=hadoop
 export HDFS_SECONDARYNAMENODE_USER=hadoop
@@ -32,14 +33,16 @@ su hadoop -c "$HADOOP_HOME/bin/yarn --daemon start resourcemanager"
 su hadoop -c "$HADOOP_HOME/bin/yarn --daemon start nodemanager"
 su hadoop -c "$HADOOP_HOME/bin/mapred --daemon start historyserver"
 
-for _ in $(seq 1 30); do
+has_logs=false
+for _ in $(seq 1 "$HADOOP_LOG_WAIT_SECONDS"); do
   if compgen -G "$HADOOP_LOG_DIR/*.log" > /dev/null; then
+    has_logs=true
     break
   fi
   sleep 1
 done
 
-if compgen -G "$HADOOP_LOG_DIR/*.log" > /dev/null; then
+if [ "$has_logs" = true ]; then
   tail -F "$HADOOP_LOG_DIR"/*.log
 else
   tail -f /dev/null
